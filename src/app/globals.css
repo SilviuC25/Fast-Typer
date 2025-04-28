@@ -22,3 +22,21 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Light mode colors */
+:root {
+  --gradient-from-light: #ff80b5;
+  --gradient-to-light: #9089fc;
+  --background-gradient-light: linear-gradient(to top right, var(--gradient-from-light), var(--gradient-to-light));
+
+  --text-color-light: #111827;
+}
+
+/* Dark mode colors */
+[data-theme='dark'] {
+  --gradient-from-dark: #ff5e99;
+  --gradient-to-dark: #6a4cf7;
+  --background-gradient-dark: linear-gradient(to top right, var(--gradient-from-dark), var(--gradient-to-dark));
+
+  --text-color-dark: #f1f5f9;
+}
