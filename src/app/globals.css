@@ -1,10 +1,5 @@
 @import "tailwindcss";
 
-@theme {
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -17,13 +12,15 @@
   }
 }
 
-body {
+html, body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Light mode colors */
 :root {
   --gradient-from-light: #ff80b5;
   --gradient-to-light: #9089fc;
@@ -32,7 +29,6 @@ body {
   --text-color-light: #111827;
 }
 
-/* Dark mode colors */
 [data-theme='dark'] {
   --gradient-from-dark: #ff5e99;
   --gradient-to-dark: #6a4cf7;

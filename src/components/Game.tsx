@@ -1,136 +1,183 @@
 "use client";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import Timer from "@/components/Timer";
+import { getWords } from "@/lib/getWords";
 
-// Fetch random words from an API
+type Difficulty = "easy" | "medium" | "hard";
+type Language = "english" | "romana";
+
+function normalizeInput(str: string): string {
+  return str.normalize("NFD").replace(/[\u0326\u0306\u0307\u031B\u0327\u0328]/g, "").normalize("NFC");
+}
+
+
 export default function Game() {
+  const [language, setLanguage] = useState<Language>("english");
+  const [difficulty, setDifficulty] = useState<Difficulty>("easy");
+  const [duration, setDuration] = useState(60);
   const [words, setWords] = useState<string[]>([]);
-  const [inputValue, setInputValue] = useState(""); // Track all typed characters
-  const [time, setTime] = useState(60); // Start time at 60 seconds
-  const [isRunning, setIsRunning] = useState(false);
-  const [wpm, setWpm] = useState(0);
   const [targetText, setTargetText] = useState<string[]>([]);
+  const [inputValue, setInputValue] = useState("");
   const [currentLine, setCurrentLine] = useState(0);
-  const [correctWordsCount, setCorrectWordsCount] = useState(0);
-  const [startTime, setStartTime] = useState<number>(0); // Track the start time of the game
+  const [wpm, setWpm] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
+  const [time, setTime] = useState(duration);
+  const [startTime, setStartTime] = useState<number>(0);
 
-  // Fetch words from API when starting the game
   const fetchWords = async () => {
-    try {
-      const response = await fetch("https://random-word-api.vercel.app/api?words=30&alphabetize=true");
-      const data = await response.json();
-      setWords(data);
-      generateText(data);
-    } catch (error) {
-      console.error("Error fetching words:", error);
-    }
+    const data = await getWords(language, difficulty);
+    setWords(data);
+    generateText(data);
   };
 
-  // Split words into lines
   const generateText = (words: string[]) => {
-    const wordsPerLine = 12; // We use 12 words per line to make the text longer and fit better
+    const perLine = 12;
     const lines = [];
-    for (let i = 0; i < words.length; i += wordsPerLine) {
-      lines.push(words.slice(i, i + wordsPerLine).join(" "));
+    for (let i = 0; i < words.length; i += perLine) {
+      lines.push(words.slice(i, i + perLine).join(" "));
     }
-    setTargetText(lines); // Set target text as the lines
+    setTargetText(lines);
   };
 
-  // Function to start the game
-  function startGame() {
-    setInputValue(""); // Reset input
-    setTime(60); // Set timer to 60 seconds when starting the game
-    setWpm(0); // Reset WPM
-    setIsRunning(true); // Start the game
-    setCurrentLine(0); // Reset current line
-    setCorrectWordsCount(0); // Reset correct words count
-    setStartTime(Date.now()); // Set the start time
-    fetchWords(); // Fetch new words when starting the game
-  }
+  const startGame = () => {
+    setInputValue("");
+    setTime(duration);
+    setWpm(0);
+    setIsRunning(true);
+    setCurrentLine(0);
+    setStartTime(Date.now());
+    fetchWords();
+  };
 
-  // Function to calculate WPM
-  function calculateWPM() {
-    const wordsTyped = inputValue.trim().split(" ").filter(word => word !== "").length;
-    const correctWords = targetText.slice(0, currentLine + 1).join(" ").split(" ").slice(0, wordsTyped).filter((word, index) => word === inputValue.split(" ")[index]).length;
-
-    setCorrectWordsCount(correctWords);
-
-    const elapsedTime = (Date.now() - startTime) / 1000;
-    const minutes = elapsedTime / 60;
-    setWpm(Math.round(correctWords / minutes));
-  }
+  const calculateWPM = () => {
+    const typedWords = normalizeInput(inputValue).trim().split(" ").filter(Boolean);
+    const expectedWords = normalizeInput(targetText.join(" ")).split(" ");
+  
+    const correct = typedWords.filter((word, i) => word === expectedWords[i]).length;
+    const elapsed = (Date.now() - startTime) / 1000 / 60;
+  
+    setWpm(Math.round(correct / elapsed));
+  };
+  
 
   useEffect(() => {
-    if (isRunning && inputValue === targetText[currentLine]) {
+    const normalizedInput = normalizeInput(inputValue);
+    const normalizedTarget = normalizeInput(targetText[currentLine] || "");
+    if (isRunning && normalizedInput === normalizedTarget) {
       setCurrentLine((prev) => prev + 1);
       setInputValue("");
     }
-  }, [inputValue, currentLine, targetText, isRunning]);
-
-  function getColoredText() {
-    const currentLineText = targetText[currentLine];
-    return currentLineText.split("").map((char, index) => {
-      let color = "opacity-60 text-gray-800";
-      if (inputValue[index] === char) {
-        color = "opacity-100 text-gray-800";
-      } else if (inputValue[index] !== undefined) {
-        color = "opacity-100 text-red-500";
-      }
-
-      return (
-        <span key={index} className={`transition-all ${color}`}>
-          {char}
-        </span>
-      );
-    });
-  }
+  }, [inputValue]);
+  
 
   useEffect(() => {
-    if (time === 0) {
+    if (time === 0 && isRunning) {
       setIsRunning(false);
       calculateWPM();
     }
   }, [time]);
 
+  const getColoredText = () => {
+    const text = targetText[currentLine] || "";
+    const normalizedTarget = normalizeInput(text);
+    const normalizedInputValue = normalizeInput(inputValue);
+  
+    return text.split("").map((char, idx) => {
+      const expectedChar = normalizedTarget[idx];
+      const typedChar = normalizedInputValue[idx];
+      const isCorrect = typedChar === expectedChar;
+      const color = typedChar
+        ? isCorrect
+          ? "text-green-600"
+          : "text-red-500"
+        : "text-gray-500";
+      return (
+        <motion.span key={idx} className={`transition-all ${color}`} layout>
+          {char}
+        </motion.span>
+      );
+    });
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center w-full min-h-screen">
-      <h1 className="text-4xl font-bold mb-8 text-gray-800">Typing Speed Game</h1>
+    <div className="flex flex-col items-center min-h-screen w-full p-4">
+      <motion.h1
+        className="text-4xl font-bold mb-6 text-gray-800"
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        Typing Speed Game
+      </motion.h1>
 
-      <div className="w-full max-w-5xl text-center text-2xl font-mono p-4 mb-6 text-gray-800">
-        {targetText.length > 0 ? (
-          <div>
-            <div className="mb-4 w-full">
-              <p className="text-xl font-mono opacity-70">
-                {getColoredText()}
-              </p>
-            </div>
-          </div>
-        ) : (
-          <p>Loading words...</p>
-        )}
+      <motion.div className="flex gap-4 mb-4 flex-wrap justify-center">
+        <select
+          value={language}
+          onChange={(e) => setLanguage(e.target.value as Language)}
+          className="p-2 rounded border"
+        >
+          <option value="english">English</option>
+          <option value="romana">Română</option>
+        </select>
+        <select
+          value={difficulty}
+          onChange={(e) => setDifficulty(e.target.value as Difficulty)}
+          className="p-2 rounded border"
+        >
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+        <select
+          value={duration}
+          onChange={(e) => setDuration(parseInt(e.target.value))}
+          className="p-2 rounded border"
+        >
+          <option value={15}>15s</option>
+          <option value={30}>30s</option>
+          <option value={60}>60s</option>
+          <option value={120}>120s</option>
+        </select>
+      </motion.div>
+
+      <div className="text-xl font-mono bg-white p-4 rounded-md w-full max-w-5xl text-center mb-4">
+        {getColoredText()}
       </div>
 
-      <div className="w-full max-w-5xl text-center text-2xl font-mono p-4 mb-6">
-        <input
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          disabled={!isRunning}
-          className="mt-4 p-2 border rounded w-full max-w-lg text-xl"
-          placeholder="Start typing here"
-        />
-      </div>
+      <motion.input
+        type="text"
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+        disabled={!isRunning}
+        className="border p-2 rounded w-full max-w-xl text-lg text-center"
+        placeholder="Start typing..."
+        whileFocus={{ scale: 1.02 }}
+      />
 
-      <Timer time={time} setTime={setTime} isRunning={isRunning} setIsRunning={setIsRunning} />
+      <Timer
+        time={time}
+        setTime={setTime}
+        isRunning={isRunning}
+        setIsRunning={setIsRunning}
+      />
 
-      <button
+      <motion.button
         onClick={startGame}
-        className="mt-8 px-6 py-3 bg-blue-500 text-white rounded-lg text-xl"
+        className="mt-6 bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600"
+        whileTap={{ scale: 0.95 }}
       >
         {isRunning ? "Restart" : "Start Game"}
-      </button>
+      </motion.button>
 
-      {wpm > 0 && <p className="mt-4 text-lg text-gray-800">Your speed: {wpm} WPM</p>}
+      {wpm > 0 && (
+        <motion.p
+          className="mt-4 text-lg text-gray-700"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          Your speed: <strong>{wpm} WPM</strong>
+        </motion.p>
+      )}
     </div>
   );
 }
