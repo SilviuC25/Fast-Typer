@@ -1,29 +1,31 @@
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
 interface TimerProps {
   time: number;
-  setTime: React.Dispatch<React.SetStateAction<number>>;
+  setTime: (time: number) => void;
   isRunning: boolean;
-  setIsRunning: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsRunning: (running: boolean) => void;
 }
 
-export default function Timer({ time, setTime, isRunning, setIsRunning }: TimerProps) {
+const Timer: React.FC<TimerProps> = ({ time, setTime, isRunning, setIsRunning }) => {
   useEffect(() => {
-    if (isRunning && time > 0) {
-      const timerInterval = setInterval(() => {
-        setTime((prevTime) => prevTime - 1);
-      }, 1000);
+    if (!isRunning) return;
 
-      // Clear the interval when the time is up or game is stopped
-      return () => clearInterval(timerInterval);
-    } else if (time === 0) {
-      setIsRunning(false); // Stop the game when time runs out
+    if (time > 0) {
+      const timerId = setTimeout(() => {
+        setTime(time - 1);
+      }, 1000);
+      return () => clearTimeout(timerId);
+    } else {
+      setIsRunning(false);
     }
-  }, [isRunning, time, setTime, setIsRunning]);
+  }, [time, isRunning, setTime, setIsRunning]);
 
   return (
-    <div className="text-4xl font-bold mt-4 text-gray-800">
+    <div className="text-2xl font-bold text-indigo-600">
       Time Left: {time}s
     </div>
   );
-}
+};
+
+export default Timer;
