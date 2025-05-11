@@ -12,6 +12,30 @@
   }
 }
 
+@keyframes drawBorder {
+  0% {
+    clip-path: polygon(0% 0%, 0% 0%, 0% 0%, 0% 0%);
+  }
+  25% {
+    clip-path: polygon(0% 0%, 100% 0%, 100% 0%, 0% 0%);
+  }
+  50% {
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 0%);
+  }
+  75% {
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+  }
+  100% {
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+  }
+}
+
+.before\:animate-drawBorder::before {
+  content: "";
+  animation: drawBorder 1.5s ease forwards;
+  border: 2px solid #4f46e5;
+}
+
 html, body {
   height: 100%;
   display: flex;
@@ -27,12 +51,4 @@ html, body {
   --background-gradient-light: linear-gradient(to top right, var(--gradient-from-light), var(--gradient-to-light));
 
   --text-color-light: #111827;
-}
-
-[data-theme='dark'] {
-  --gradient-from-dark: #ff5e99;
-  --gradient-to-dark: #6a4cf7;
-  --background-gradient-dark: linear-gradient(to top right, var(--gradient-from-dark), var(--gradient-to-dark));
-
-  --text-color-dark: #f1f5f9;
 }

@@ -1,9 +1,37 @@
-'use client';
+"use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { jwtDecode } from "jwt-decode";
+
+interface DecodedToken {
+  userId: string;
+  email: string;
+  username: string;
+  exp: number;
+}
 
 export default function Navbar() {
+  const [username, setUsername] = useState<string | null>(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const decoded = jwtDecode<DecodedToken>(token);
+      if (decoded.exp * 1000 > Date.now()) {
+        setUsername(decoded.username);
+      } else {
+        localStorage.removeItem("token");
+      }
+    } catch (err) {
+      console.error("Invalid token", err);
+      localStorage.removeItem("token");
+    }
+  }, []);
+
   return (
     <header className="absolute inset-x-0 top-0 z-50">
       <motion.nav
@@ -15,7 +43,6 @@ export default function Navbar() {
       >
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 p-1.5">
-            <span className="sr-only">Fast Typer</span>
             <img className="h-11 w-auto" src="/typing_logo.png" alt="Typing Logo" />
           </Link>
         </div>
@@ -26,7 +53,10 @@ export default function Navbar() {
             { href: "/leaderboard", label: "Leaderboard" },
             { href: "/how-it-works", label: "How it works" },
             { href: "/practice", label: "Practice Mode" },
-            { href: "/profile", label: "Profile" },
+            {
+              href: username ? `/profile/${username}` : "/login",
+              label: "Profile",
+            },
           ].map((item) => (
             <Link
               key={item.href}
@@ -39,12 +69,18 @@ export default function Navbar() {
         </div>
 
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-          <Link
-            href="/login"
-            className="text-sm font-semibold text-indigo-600 hover:text-indigo-500 transition duration-200"
-          >
-            Log in <span aria-hidden="true">&rarr;</span>
-          </Link>
+          {username ? (
+            <span className="text-sm font-semibold text-indigo-700">
+              Welcome, {username}
+            </span>
+          ) : (
+            <Link
+              href="/login"
+              className="text-sm font-semibold text-indigo-600 hover:text-indigo-500 transition duration-200"
+            >
+              Log in <span aria-hidden="true">&rarr;</span>
+            </Link>
+          )}
         </div>
       </motion.nav>
     </header>
