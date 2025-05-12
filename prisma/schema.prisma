@@ -8,24 +8,27 @@ datasource db {
 }
 
 model User {
-  id             String   @id @default(uuid())
-  email          String   @unique
-  username       String   @unique
-  passwordHash   String
-  createdAt      DateTime @default(now())
-  tests          Test[]
-  maxWPM         Float    @default(0)
-  totalTests     Int      @default(0)
-  averageAccuracy Float   @default(0)
+  id              String   @id @default(uuid())
+  email           String   @unique
+  username        String   @unique
+  passwordHash    String
+  createdAt       DateTime @default(now())
+  tests           Test[]
+  maxWPM          Float    @default(0)
+  totalTests      Int      @default(0)
+  averageAccuracy Float    @default(0)
 }
 
 model Test {
-  id             String   @id @default(uuid())
-  user           User     @relation(fields: [userId], references: [id])
-  userId         String
-  wpm            Float
-  accuracy       Float
-  correctWords   Int
-  wrongWords     Int
-  createdAt      DateTime @default(now())
+  id            String   @id @default(uuid())
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String
+  wpm           Float
+  accuracy      Float
+  correctWords  Int
+  wrongWords    Int
+  language      String
+  difficulty    String
+  duration      Int
+  createdAt     DateTime @default(now())
 }

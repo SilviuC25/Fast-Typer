@@ -1,25 +1,60 @@
 // src/app/api/profile/[username]/route.ts
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma"; // Asigură-te că importi corect Prisma
+import { prisma } from "@/lib/prisma";
 
-export async function GET(req: Request, { params }: { params: { username: string } }) {
+export async function GET(
+  req: Request,
+  { params }: { params: { username: string } }
+) {
   try {
     const user = await prisma.user.findUnique({
       where: {
         username: params.username,
       },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+      },
     });
 
     if (!user) {
-      return NextResponse.json(
-        { message: "User not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    return NextResponse.json(user);
+    // Explicităm tipul pentru fiecare test
+    const tests: { wpm: number; accuracy: number }[] = await prisma.test.findMany({
+      where: {
+        userId: user.id,
+      },
+      select: {
+        wpm: true,
+        accuracy: true,
+      },
+    });
+
+    const totalTests = tests.length;
+
+    const maxWPM = totalTests > 0 ? Math.max(...tests.map((t) => t.wpm)) : null;
+
+    const averageAccuracy =
+      totalTests > 0
+        ? tests.reduce(
+            (sum, t) => sum + t.accuracy,
+            0 as number
+          ) / totalTests
+        : null;
+
+    return NextResponse.json({
+      ...user,
+      stats: {
+        totalTests,
+        maxWPM,
+        averageAccuracy,
+      },
+    });
   } catch (error) {
-    console.error(error);
+    console.error("API error:", error);
     return NextResponse.json(
       { message: "Something went wrong" },
       { status: 500 }

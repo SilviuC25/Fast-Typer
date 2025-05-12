@@ -1,18 +1,9 @@
 'use client';
 
-import { motion } from "framer-motion";
-import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
+import RedirectButton from "@/components/RedirectButton";
 
 export default function HowItWorksPage() {
-  const cardVariants = {
-    initial: { opacity: 0, y: 30 },
-    animate: (i: number) => ({
-      opacity: 1,
-      y: 0,
-      transition: { delay: i * 0.2, duration: 0.5 }
-    }),
-  };
-
   const features = [
     {
       title: "Practice Mode (No Account Needed)",
@@ -48,36 +39,32 @@ export default function HowItWorksPage() {
       </motion.h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {features.map((feature, i) => (
-          <motion.div
-            key={feature.title}
-            className="rounded-xl border border-gray-200 bg-white p-6 shadow-md hover:shadow-xl transition"
-            initial="initial"
-            animate="animate"
-            variants={cardVariants}
-            custom={i}
-          >
-            <h2 className="text-xl font-semibold mb-2 text-indigo-600">
-              {feature.title}
-            </h2>
-            <p className="text-gray-700">{feature.description}</p>
-          </motion.div>
-        ))}
+        <AnimatePresence>
+          {features.map((feature, i) => (
+            <motion.div
+              key={feature.title}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ delay: i * 0.15, duration: 0.5 }}
+            >
+              <div className="group relative p-6 rounded-xl bg-white backdrop-blur-md shadow-md hover:shadow-2xl transition-all duration-300 border border-indigo-200 hover:scale-[1.02]">
+                {/* Animated Border on Hover */}
+                <div className="absolute inset-0 z-0 rounded-xl pointer-events-none before:absolute before:inset-0 before:rounded-xl before:border-2 before:border-indigo-600 before:opacity-0 group-hover:before:opacity-100 before:animate-drawBorder transition-opacity duration-300" />
+                
+                <div className="relative z-10">
+                  <h2 className="text-xl font-semibold mb-2 text-indigo-600">
+                    {feature.title}
+                  </h2>
+                  <p className="text-gray-700">{feature.description}</p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
 
-      <motion.div
-        className="mt-16 text-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1, duration: 0.5 }}
-      >
-        <Link
-          href="/practice"
-          className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-md font-semibold text-lg transition hover:bg-indigo-500"
-        >
-          Try It Now
-        </Link>
-      </motion.div>
+      <RedirectButton buttonText="Try It Now" />
     </main>
   );
 }

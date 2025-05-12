@@ -9,11 +9,20 @@ import { getWords } from '@/lib/getWords';
 import { shuffleArray } from '@/lib/shuffleArray';
 import { generateText } from '@/lib/generateText';
 import { normalizeInput } from '@/lib/normalizeInput';
+import ResultModal from './ResultModal';
+
+interface GameProps {
+  user?: {
+    userId: string;
+    username: string;
+    email: string;
+  };
+}
 
 type Difficulty = 'easy' | 'medium' | 'hard';
 type Language = 'english' | 'romana';
 
-export default function Game() {
+export default function Game({ user }: GameProps) {
   const [language, setLanguage] = useState<Language>('english');
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
   const [duration, setDuration] = useState(60);
@@ -23,11 +32,13 @@ export default function Game() {
   const [fullInputValue, setFullInputValue] = useState('');
   const [currentLine, setCurrentLine] = useState(0);
   const [wpm, setWpm] = useState(0);
+  const [correctWords, setCorrectWords] = useState(0);
   const [wrongWords, setWrongWords] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [time, setTime] = useState(duration);
   const [startTime, setStartTime] = useState<number>(0);
   const [gameFinished, setGameFinished] = useState(false);
+  const [showResult, setShowResult] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const perLine = 12;
@@ -44,6 +55,7 @@ export default function Game() {
     setFullInputValue('');
     setTime(duration);
     setWpm(0);
+    setCorrectWords(0);
     setWrongWords(0);
     setIsRunning(true);
     setCurrentLine(0);
@@ -62,17 +74,46 @@ export default function Game() {
     const targetWords = normalizeInput(targetText.join(' ')).trim().split(/\s+/);
 
     let correctChars = 0;
+    let correct = 0;
 
     for (let i = 0; i < typedWords.length; i++) {
       if (typedWords[i] === targetWords[i]) {
         correctChars += typedWords[i].length + 1;
+        correct++;
       }
     }
+
+    setCorrectWords(correct);
 
     const elapsedTime = (Date.now() - startTime) / 60000;
     const minutes = Math.max(elapsedTime, 0.01);
 
     return Math.round((correctChars / 5) / minutes);
+  };
+
+  const saveTestToDatabase = async () => {
+    if (!user) return;
+
+    try {
+      await fetch('/api/tests', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.userId,
+          wpm,
+          accuracy: Math.round((correctWords / (correctWords + wrongWords)) * 100),
+          correctWords,
+          wrongWords,
+          language,
+          difficulty,
+          duration,
+        }),
+      });
+    } catch (error) {
+      console.error('Error saving test:', error);
+    }
   };
 
   useEffect(() => {
@@ -90,9 +131,7 @@ export default function Game() {
       let incorrect = 0;
 
       for (let i = 0; i < typedWords.length; i++) {
-        const inputWord = typedWords[i];
-        const targetWord = expectedWords[i];
-        if (inputWord !== targetWord) incorrect++;
+        if (typedWords[i] !== expectedWords[i]) incorrect++;
       }
 
       setWrongWords((prev) => prev + incorrect);
@@ -112,9 +151,14 @@ export default function Game() {
       setGameFinished(true);
       const wpmResult = calculateWPM(fullInputValue + inputValue, targetText, startTime);
       setWpm(wpmResult);
-      console.log("Game finished:", wpmResult);
     }
-  }, [time, isRunning, fullInputValue, inputValue, targetText, startTime]);
+  }, [time, isRunning]);
+
+  useEffect(() => {
+    if (gameFinished && user) {
+      saveTestToDatabase();
+    }
+  }, [gameFinished]);
 
   const progressPercent = Math.min(
     (inputValue.length / (targetText[currentLine]?.length || 1)) * 100,
@@ -164,20 +208,27 @@ export default function Game() {
 
       <Timer time={time} setTime={setTime} isRunning={isRunning} setIsRunning={setIsRunning} />
 
-      <motion.button
-        onClick={startGame}
-        className="mt-6 px-6 py-2 rounded-full border border-indigo-600 text-indigo-600 font-semibold bg-white hover:bg-indigo-100 hover:text-indigo-700 shadow-sm transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-300"
-        whileTap={{ scale: 0.96 }}
-      >
-        {isRunning ? 'Restart' : 'Start Game'}
-      </motion.button>
+      <motion.div className="flex gap-4 mt-6">
+        <motion.button
+          onClick={startGame}
+          className="px-6 py-2 rounded-full border border-indigo-600 text-indigo-600 font-semibold bg-white hover:bg-indigo-100 hover:text-indigo-700 shadow-sm transition-all duration-200 cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-300"
+          whileTap={{ scale: 0.96 }}
+        >
+          {isRunning ? 'Restart' : 'Start Game'}
+        </motion.button>
 
-      {gameFinished && (
-        <motion.div className="mt-6 text-lg font-semibold text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <p>Your speed: <strong>{wpm} WPM</strong></p>
-          <p>Wrong words: <strong>{wrongWords}</strong></p>
-        </motion.div>
-      )}
+        {gameFinished && (
+          <motion.button
+            onClick={() => setShowResult(true)}
+            className="px-6 py-2 bg-indigo-600 text-white rounded-full font-semibold hover:bg-indigo-500 transition-all duration-200 cursor-pointer focus:outline-none"
+            whileTap={{ scale: 0.96 }}
+          >
+            See Results
+          </motion.button>
+        )}
+      </motion.div>
+
+      {showResult && <ResultModal wpm={wpm} correctWords={correctWords} wrongWords={wrongWords} onClose={() => setShowResult(false)} />}
     </div>
   );
 }

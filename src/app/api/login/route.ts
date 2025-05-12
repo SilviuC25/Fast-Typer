@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
   try {
@@ -38,7 +36,7 @@ export async function POST(req: Request) {
       {
         userId: user.id,
         email: user.email,
-        username: user.username, // ✅ inclus în token
+        username: user.username,
       },
       process.env.JWT_SECRET!,
       { expiresIn: "1h" }
