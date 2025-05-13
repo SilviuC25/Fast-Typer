@@ -59,12 +59,12 @@ export default function ProfilePage() {
   const { email, stats } = userData;
 
   return (
-    <div className="min-h-screen px-4 py-12 flex justify-center items-start bg-gray-50 dark:bg-zinc-900">
+    <div className="min-h-screen px-4 py-12 flex justify-center items-start">
       <motion.div
         initial={{ opacity: 0, y: 60 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="relative w-full max-w-4xl rounded-3xl shadow-xl p-8 space-y-8 bg-white dark:bg-zinc-800"
+        className="relative w-full max-w-4xl rounded-3xl shadow-xl p-8 space-y-8"
       >
         <div className="relative z-10 border-b pb-4 border-zinc-200 dark:border-zinc-700">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

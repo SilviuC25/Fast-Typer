@@ -1,12 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import type { NextRequest } from "next/server";
 
 export async function GET(
-  req: NextRequest,
-  { params }: { params: { username: string } }
+  request: NextRequest,
+  context: { params: { username: string } }
 ) {
-  const username = params.username;
+  const { username } = context.params;
 
   if (!username || typeof username !== "string") {
     return NextResponse.json({ message: "Invalid username" }, { status: 400 });
@@ -26,22 +25,17 @@ export async function GET(
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    const tests: { wpm: number; accuracy: number }[] = await prisma.test.findMany({
+    const tests = await prisma.test.findMany({
       where: { userId: user.id },
       select: { wpm: true, accuracy: true },
     });
 
     const totalTests = tests.length;
-
-    const maxWPM =
-      totalTests > 0 ? Math.max(...tests.map((t: { wpm: number }) => t.wpm)) : null;
+    const maxWPM = totalTests > 0 ? Math.max(...tests.map((t: { wpm: number }) => t.wpm)) : null;
 
     const averageAccuracy =
       totalTests > 0
-        ? tests.reduce(
-            (sum: number, t: { accuracy: number }) => sum + t.accuracy,
-            0
-          ) / totalTests
+        ? tests.reduce((sum: number, t: { accuracy: number }) => sum + t.accuracy, 0) / totalTests
         : null;
 
     return NextResponse.json({
