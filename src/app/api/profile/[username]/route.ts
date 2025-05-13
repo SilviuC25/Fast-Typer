@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { username: string } }
+  { params }: { params: any }
 ) {
   const { username } = params;
 
