@@ -26,7 +26,6 @@ export default function Game({ user }: GameProps) {
   const [language, setLanguage] = useState<Language>('english');
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
   const [duration, setDuration] = useState(60);
-  const [words, setWords] = useState<string[]>([]);
   const [targetText, setTargetText] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [fullInputValue, setFullInputValue] = useState('');
@@ -46,7 +45,6 @@ export default function Game({ user }: GameProps) {
   const fetchWords = async () => {
     const data = await getWords(language, difficulty);
     const shuffled = shuffleArray(data);
-    setWords(shuffled);
     setTargetText(generateText(shuffled, perLine));
   };
 
@@ -143,7 +141,7 @@ export default function Game({ user }: GameProps) {
         return next < targetText.length ? next : prev;
       });
     }
-  }, [inputValue]);
+  }, [inputValue, currentLine, isRunning, targetText]);
 
   useEffect(() => {
     if (time <= 0 && isRunning) {
@@ -152,13 +150,13 @@ export default function Game({ user }: GameProps) {
       const wpmResult = calculateWPM(fullInputValue + inputValue, targetText, startTime);
       setWpm(wpmResult);
     }
-  }, [time, isRunning]);
+  }, [time, isRunning, fullInputValue, inputValue, startTime, targetText]);
 
   useEffect(() => {
     if (gameFinished && user) {
       saveTestToDatabase();
     }
-  }, [gameFinished]);
+  }, [gameFinished, user]);
 
   const progressPercent = Math.min(
     (inputValue.length / (targetText[currentLine]?.length || 1)) * 100,

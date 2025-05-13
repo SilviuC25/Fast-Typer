@@ -79,9 +79,12 @@ export default function ProfilePage() {
 
             <button
               onClick={() => router.push(`/profile/${username}/recent-tests`)}
-              className="relative group px-4 py-2 text-sm font-medium text-gray-800 dark:text-white bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-600 dark:hover:bg-indigo-700 rounded-md transition"
+              className="relative group px-4 py-2 text-sm font-medium text-gray-800 hover:bg-indigo-50 hover:cursor-pointer rounded-md transition overflow-hidden"
             >
-              View Recent Tests
+              <span className="relative z-10">View Recent Tests</span>
+              <span
+                className="absolute inset-0 rounded-md border-2 border-indigo-600 opacity-0 group-hover:opacity-100 group-hover:animate-drawBorder pointer-events-none"
+              ></span>
             </button>
           </div>
         </div>
