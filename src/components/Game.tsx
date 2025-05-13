@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import Timer from './Timer';
 import OptionGroup from './OptionGroup';
@@ -89,7 +89,7 @@ export default function Game({ user }: GameProps) {
     return Math.round((correctChars / 5) / minutes);
   };
 
-  const saveTestToDatabase = async () => {
+  const saveTestToDatabase = useCallback(async () => {
     if (!user) return;
 
     try {
@@ -112,7 +112,7 @@ export default function Game({ user }: GameProps) {
     } catch (error) {
       console.error('Error saving test:', error);
     }
-  };
+  }, [user, wpm, correctWords, wrongWords, language, difficulty, duration]);
 
   useEffect(() => {
     if (!isRunning) return;
@@ -156,7 +156,7 @@ export default function Game({ user }: GameProps) {
     if (gameFinished && user) {
       saveTestToDatabase();
     }
-  }, [gameFinished, user]);
+  }, [gameFinished, user, saveTestToDatabase]);
 
   const progressPercent = Math.min(
     (inputValue.length / (targetText[currentLine]?.length || 1)) * 100,
@@ -226,7 +226,14 @@ export default function Game({ user }: GameProps) {
         )}
       </motion.div>
 
-      {showResult && <ResultModal wpm={wpm} correctWords={correctWords} wrongWords={wrongWords} onClose={() => setShowResult(false)} />}
+      {showResult && (
+        <ResultModal
+          wpm={wpm}
+          correctWords={correctWords}
+          wrongWords={wrongWords}
+          onClose={() => setShowResult(false)}
+        />
+      )}
     </div>
   );
 }
