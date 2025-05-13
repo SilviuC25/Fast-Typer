@@ -2,14 +2,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import type { NextRequest } from "next/server";
 
-interface Params {
-  params: {
-    username: string;
-  };
-}
-
-export async function GET(req: NextRequest, context: Params) {
-  const { username } = context.params;
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { username: string } }
+) {
+  const { username } = params;
 
   try {
     const user = await prisma.user.findUnique({
@@ -38,9 +35,7 @@ export async function GET(req: NextRequest, context: Params) {
     });
 
     const totalTests = tests.length;
-
     const maxWPM = totalTests > 0 ? Math.max(...tests.map((t) => t.wpm)) : null;
-
     const averageAccuracy =
       totalTests > 0
         ? tests.reduce((sum, t) => sum + t.accuracy, 0) / totalTests
