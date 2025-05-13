@@ -2,18 +2,16 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import type { NextRequest } from "next/server";
 
-// ✅ Nu tipăm manual contextul
-export async function GET(
-  req: NextRequest,
-  context: { params: { username: string } } // ← Așa e permis de Next.js!
-) {
-  const { username } = context.params;
+export async function GET(req: NextRequest, context: any) {
+  const username = context?.params?.username;
+
+  if (!username || typeof username !== "string") {
+    return NextResponse.json({ message: "Invalid username" }, { status: 400 });
+  }
 
   try {
     const user = await prisma.user.findUnique({
-      where: {
-        username: username,
-      },
+      where: { username },
       select: {
         id: true,
         username: true,
@@ -26,20 +24,23 @@ export async function GET(
     }
 
     const tests: { wpm: number; accuracy: number }[] = await prisma.test.findMany({
-      where: {
-        userId: user.id,
-      },
-      select: {
-        wpm: true,
-        accuracy: true,
-      },
+      where: { userId: user.id },
+      select: { wpm: true, accuracy: true },
     });
 
     const totalTests = tests.length;
-    const maxWPM = totalTests > 0 ? Math.max(...tests.map((t) => t.wpm)) : null;
+
+    const maxWPM =
+      totalTests > 0
+        ? Math.max(...tests.map((t: { wpm: number }) => t.wpm))
+        : null;
+
     const averageAccuracy =
       totalTests > 0
-        ? tests.reduce((sum, t) => sum + t.accuracy, 0) / totalTests
+        ? tests.reduce(
+            (sum: number, t: { accuracy: number }) => sum + t.accuracy,
+            0
+          ) / totalTests
         : null;
 
     return NextResponse.json({
