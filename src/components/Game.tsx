@@ -25,7 +25,7 @@ type Language = 'english' | 'romana';
 export default function Game({ user }: GameProps) {
   const [language, setLanguage] = useState<Language>('english');
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
-  const [duration, setDuration] = useState(60);
+  const [duration, setDuration] = useState<number>(60);
   const [targetText, setTargetText] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [fullInputValue, setFullInputValue] = useState('');
@@ -177,9 +177,24 @@ export default function Game({ user }: GameProps) {
       </motion.h1>
 
       <div className="flex flex-wrap justify-center gap-8 mb-6">
-        <OptionGroup title="Language" options={['english', 'romana']} selected={language} onSelect={setLanguage} />
-        <OptionGroup title="Difficulty" options={['easy', 'medium', 'hard']} selected={difficulty} onSelect={setDifficulty} />
-        <OptionGroup title="Time" options={[15, 30, 60, 90, 120]} selected={duration} onSelect={setDuration} />
+        <OptionGroup
+          title="Language"
+          options={['english', 'romana']}
+          selected={language}
+          onSelect={(val: string | number) => setLanguage(val as Language)}
+        />
+        <OptionGroup
+          title="Difficulty"
+          options={['easy', 'medium', 'hard']}
+          selected={difficulty}
+          onSelect={(val: string | number) => setDifficulty(val as Difficulty)}
+        />
+        <OptionGroup
+          title="Time"
+          options={[15, 30, 60, 90, 120]}
+          selected={duration}
+          onSelect={(val: string | number) => setDuration(Number(val))}
+        />
       </div>
 
       <div className="text-4xl font-mono leading-relaxed text-center max-w-5xl mb-6 break-words">
