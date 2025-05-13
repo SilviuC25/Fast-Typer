@@ -5,10 +5,10 @@ import { motion } from 'framer-motion';
 import Timer from './Timer';
 import OptionGroup from './OptionGroup';
 import ColoredText from './ColoredText';
-import { getWords } from '@/lib/getWords';
-import { shuffleArray } from '@/lib/shuffleArray';
-import { generateText } from '@/lib/generateText';
-import { normalizeInput } from '@/lib/normalizeInput';
+import { getWords } from '../lib/getWords';
+import { shuffleArray } from '../lib/shuffleArray';
+import { generateText } from '../lib/generateText';
+import { normalizeInput } from '../lib/normalizeInput';
 import ResultModal from './ResultModal';
 
 interface GameProps {
