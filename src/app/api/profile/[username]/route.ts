@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+type Context = {
+  params: {
+    username: string;
+  };
+};
+
 interface Test {
   wpm: number;
   accuracy: number;
@@ -8,7 +14,7 @@ interface Test {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { username: string } }
+  { params }: Context
 ) {
   const { username } = params;
 
@@ -36,11 +42,12 @@ export async function GET(
     });
 
     const totalTests = tests.length;
-    const maxWPM = totalTests > 0 ? Math.max(...tests.map((t) => t.wpm)) : null;
+    const maxWPM =
+      totalTests > 0 ? Math.max(...tests.map((t) => t.wpm)) : null;
 
     const averageAccuracy =
       totalTests > 0
-        ? tests.reduce((sum: number, t: Test) => sum + t.accuracy, 0) / totalTests
+        ? tests.reduce((sum, t) => sum + t.accuracy, 0) / totalTests
         : null;
 
     return NextResponse.json({
