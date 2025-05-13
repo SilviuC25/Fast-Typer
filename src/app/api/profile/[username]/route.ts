@@ -1,19 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-
-interface Test {
-  wpm: number;
-  accuracy: number;
-}
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { username: string } }
+  req: NextRequest,
+  context: any // 👈 FIX esențial aici!
 ) {
-  const { username } = params;
+  const username = context?.params?.username;
 
-  if (!username || typeof username !== "string") {
-    return NextResponse.json({ message: "Invalid username" }, { status: 400 });
+  if (!username || typeof username !== 'string') {
+    return NextResponse.json({ message: 'Invalid username' }, { status: 400 });
   }
 
   try {
@@ -27,18 +22,19 @@ export async function GET(
     });
 
     if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
+      return NextResponse.json({ message: 'User not found' }, { status: 404 });
     }
 
-    const tests: Test[] = await prisma.test.findMany({
+    const tests = await prisma.test.findMany({
       where: { userId: user.id },
-      select: { wpm: true, accuracy: true },
+      select: {
+        wpm: true,
+        accuracy: true,
+      },
     });
 
     const totalTests = tests.length;
-    const maxWPM =
-      totalTests > 0 ? Math.max(...tests.map((t) => t.wpm)) : null;
-
+    const maxWPM = totalTests > 0 ? Math.max(...tests.map((t) => t.wpm)) : null;
     const averageAccuracy =
       totalTests > 0
         ? tests.reduce((sum, t) => sum + t.accuracy, 0) / totalTests
@@ -52,10 +48,10 @@ export async function GET(
         averageAccuracy,
       },
     });
-  } catch (error) {
-    console.error("API error:", error);
+  } catch (err) {
+    console.error('Error in profile GET route:', err);
     return NextResponse.json(
-      { message: "Something went wrong" },
+      { message: 'Internal server error' },
       { status: 500 }
     );
   }
