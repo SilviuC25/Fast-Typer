@@ -1,24 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// Tip pentru parametrii din context (ruta dinamica)
-type Params = {
+
+interface RouteContext {
   params: {
     username: string;
   };
-};
+}
 
-// Tip pentru un test individual
-type Test = {
+interface Test {
   wpm: number;
   accuracy: number;
-};
+}
 
 export async function GET(
   request: NextRequest,
-  { params }: Params
+  context: RouteContext
 ) {
-  const username = params.username;
+  const username = context.params.username;
 
   if (!username || typeof username !== "string") {
     return NextResponse.json({ message: "Invalid username" }, { status: 400 });
@@ -45,12 +44,11 @@ export async function GET(
 
     const totalTests = tests.length;
     const maxWPM =
-      totalTests > 0 ? Math.max(...tests.map((t: Test) => t.wpm)) : null;
+      totalTests > 0 ? Math.max(...tests.map((t) => t.wpm)) : null;
 
     const averageAccuracy =
       totalTests > 0
-        ? tests.reduce((sum: number, t: Test) => sum + t.accuracy, 0) /
-          totalTests
+        ? tests.reduce((sum, t) => sum + t.accuracy, 0) / totalTests
         : null;
 
     return NextResponse.json({
