@@ -1,17 +1,26 @@
-import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma"; // sau import { PrismaClient } și new PrismaClient()
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+
+
+interface RouteContext {
+  params: {
+    username: string;
+  };
+}
 
 interface Test {
   wpm: number;
   accuracy: number;
 }
 
-export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const username = url.searchParams.get("username");
+export async function GET(
+  request: NextRequest,
+  context: RouteContext
+) {
+  const username = context.params.username;
 
   if (!username || typeof username !== "string") {
-    return NextResponse.json({ error: "Username is required" }, { status: 400 });
+    return NextResponse.json({ message: "Invalid username" }, { status: 400 });
   }
 
   try {
@@ -25,7 +34,7 @@ export async function GET(request: Request) {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
     const tests: Test[] = await prisma.test.findMany({
@@ -34,17 +43,13 @@ export async function GET(request: Request) {
     });
 
     const totalTests = tests.length;
+    const maxWPM =
+      totalTests > 0 ? Math.max(...tests.map((t) => t.wpm)) : null;
 
-    let maxWPM: number | null = null;
-    let averageAccuracy: number | null = null;
-
-    if (totalTests > 0) {
-      const wpmValues = tests.map((test: Test) => test.wpm);
-      maxWPM = Math.max(...wpmValues);
-
-      const accuracySum = tests.reduce((acc: number, test: Test) => acc + test.accuracy, 0);
-      averageAccuracy = accuracySum / totalTests;
-    }
+    const averageAccuracy =
+      totalTests > 0
+        ? tests.reduce((sum, t) => sum + t.accuracy, 0) / totalTests
+        : null;
 
     return NextResponse.json({
       ...user,
@@ -56,6 +61,9 @@ export async function GET(request: Request) {
     });
   } catch (error) {
     console.error("API error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { message: "Something went wrong" },
+      { status: 500 }
+    );
   }
 }
