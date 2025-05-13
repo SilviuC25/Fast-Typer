@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-type Context = {
-  params: {
-    username: string;
-  };
-};
-
 interface Test {
   wpm: number;
   accuracy: number;
@@ -14,7 +8,7 @@ interface Test {
 
 export async function GET(
   request: NextRequest,
-  { params }: Context
+  { params }: { params: { username: string } }
 ) {
   const { username } = params;
 
