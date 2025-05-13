@@ -10,7 +10,7 @@ interface DecodedToken {
   exp: number;
 }
 
-export async function getUserFromToken(req: Request | { headers: any }) {
+export async function getUserFromToken(req: Request | { headers: Headers }) {
   const cookieHeader = "headers" in req ? req.headers.get("cookie") : cookies().toString();
 
   const tokenMatch = cookieHeader?.match(/token=([^;]+)/);
