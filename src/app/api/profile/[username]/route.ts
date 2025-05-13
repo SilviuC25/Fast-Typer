@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import type { NextRequest } from "next/server";
 
+// ✅ Nu tipăm manual contextul
 export async function GET(
   req: NextRequest,
-  { params }: { params: Record<string, string> }
+  context: { params: { username: string } } // ← Așa e permis de Next.js!
 ) {
-  const { username } = params;
+  const { username } = context.params;
 
   try {
     const user = await prisma.user.findUnique({
