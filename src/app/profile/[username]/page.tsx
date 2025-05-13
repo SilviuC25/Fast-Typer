@@ -1,3 +1,4 @@
+// src/app/profile/[username]/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -5,8 +6,21 @@ import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 
+// Tipuri pentru datele de la API
+type UserStats = {
+  maxWPM: number | null;
+  totalTests: number;
+  averageAccuracy: number | null;
+};
+
+type UserData = {
+  username: string;
+  email: string;
+  stats: UserStats;
+};
+
 export default function ProfilePage() {
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const params = useParams();
@@ -30,7 +44,7 @@ export default function ProfilePage() {
     };
 
     fetchUserData();
-  }, [username]);
+  }, [username, router]);
 
   if (loading) {
     return (
@@ -45,17 +59,14 @@ export default function ProfilePage() {
   const { email, stats } = userData;
 
   return (
-    <div className="min-h-screen px-4 py-12 flex justify-center items-start">
+    <div className="min-h-screen px-4 py-12 flex justify-center items-start bg-gray-50 dark:bg-zinc-900">
       <motion.div
         initial={{ opacity: 0, y: 60 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        className="relative w-full max-w-4xl rounded-3xl shadow-xl p-8 space-y-8 
-          before:content-[''] before:absolute before:inset-0 before:rounded-xl 
-          before:border-2 before:border-indigo-600 before:animate-drawBorder
-          before:pointer-events-none"
+        className="relative w-full max-w-4xl rounded-3xl shadow-xl p-8 space-y-8 bg-white dark:bg-zinc-800"
       >
-        <div className="relative z-10 border-b pb-4">
+        <div className="relative z-10 border-b pb-4 border-zinc-200 dark:border-zinc-700">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">
@@ -68,12 +79,9 @@ export default function ProfilePage() {
 
             <button
               onClick={() => router.push(`/profile/${username}/recent-tests`)}
-              className="relative group px-4 py-2 text-sm font-medium text-gray-800 hover:bg-indigo-50 hover:cursor-pointer rounded-md transition overflow-hidden"
+              className="relative group px-4 py-2 text-sm font-medium text-gray-800 dark:text-white bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-600 dark:hover:bg-indigo-700 rounded-md transition"
             >
-              <span className="relative z-10">View Recent Tests</span>
-              <span
-                className="absolute inset-0 rounded-md border-2 border-indigo-600 opacity-0 group-hover:opacity-100 group-hover:animate-drawBorder pointer-events-none"
-              ></span>
+              View Recent Tests
             </button>
           </div>
         </div>
@@ -121,7 +129,11 @@ function StatCard({
       <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-2">
         {label}
       </p>
-      <p className={`text-2xl font-semibold ${color ?? "text-zinc-800 dark:text-white"}`}>
+      <p
+        className={`text-2xl font-semibold ${
+          color ?? "text-zinc-800 dark:text-white"
+        }`}
+      >
         {value}
       </p>
     </motion.div>
