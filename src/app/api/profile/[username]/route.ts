@@ -1,15 +1,20 @@
-// src/app/api/profile/[username]/route.ts
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import type { NextRequest } from "next/server";
 
-export async function GET(
-  req: Request,
-  { params }: { params: { username: string } }
-) {
+interface Params {
+  params: {
+    username: string;
+  };
+}
+
+export async function GET(req: NextRequest, context: Params) {
+  const { username } = context.params;
+
   try {
     const user = await prisma.user.findUnique({
       where: {
-        username: params.username,
+        username: username,
       },
       select: {
         id: true,
@@ -22,7 +27,6 @@ export async function GET(
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    // Explicităm tipul pentru fiecare test
     const tests: { wpm: number; accuracy: number }[] = await prisma.test.findMany({
       where: {
         userId: user.id,
@@ -39,10 +43,7 @@ export async function GET(
 
     const averageAccuracy =
       totalTests > 0
-        ? tests.reduce(
-            (sum, t) => sum + t.accuracy,
-            0 as number
-          ) / totalTests
+        ? tests.reduce((sum, t) => sum + t.accuracy, 0) / totalTests
         : null;
 
     return NextResponse.json({
