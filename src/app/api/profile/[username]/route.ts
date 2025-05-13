@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: any }
+  { params }: { params: Record<string, string> }
 ) {
   const { username } = params;
 
