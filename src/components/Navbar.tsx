@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { jwtDecode } from "jwt-decode";
 import { ChevronDown } from "lucide-react";
+import Image from "next/image";
 
 interface DecodedToken {
   userId: string;
@@ -64,7 +65,14 @@ export default function Navbar() {
       >
         <div className="flex lg:flex-1">
           <Link href="/" className="-m-1.5 p-1.5">
-            <img className="h-11 w-auto" src="/typing_logo.png" alt="Typing Logo" />
+            <Image
+              src="/typing_logo.png"
+              alt="Typing Logo"
+              width={120}
+              height={44}
+              className="h-11 w-auto"
+              priority
+            />
           </Link>
         </div>
 
