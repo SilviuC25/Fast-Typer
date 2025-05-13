@@ -1,4 +1,3 @@
-// app/leaderboard/page.tsx
 import { prisma } from '@/lib/prisma';
 import { Trophy } from 'lucide-react';
 import { LeaderboardList } from '@/components/LeaderboardList';

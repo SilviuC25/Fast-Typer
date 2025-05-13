@@ -2,14 +2,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import type { NextRequest } from "next/server";
 
-interface Context {
-  params: {
-    username: string;
-  };
-}
-
-export async function GET(req: NextRequest, context: Context) {
-  const username = context.params.username;
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { username: string } }
+) {
+  const username = params.username;
 
   if (!username || typeof username !== "string") {
     return NextResponse.json({ message: "Invalid username" }, { status: 400 });
@@ -37,9 +34,7 @@ export async function GET(req: NextRequest, context: Context) {
     const totalTests = tests.length;
 
     const maxWPM =
-      totalTests > 0
-        ? Math.max(...tests.map((t: { wpm: number }) => t.wpm))
-        : null;
+      totalTests > 0 ? Math.max(...tests.map((t: { wpm: number }) => t.wpm)) : null;
 
     const averageAccuracy =
       totalTests > 0
