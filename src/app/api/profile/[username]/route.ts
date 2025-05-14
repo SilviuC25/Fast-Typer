@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import type { NextApiRequest } from "next";
 
 interface Test {
   wpm: number;
