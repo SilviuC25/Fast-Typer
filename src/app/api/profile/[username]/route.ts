@@ -8,11 +8,11 @@ interface Test {
 
 export async function GET(
   req: NextRequest,
-  context: any
+  context: { params: Record<string, string> }
 ) {
-  const username = context.params?.username;
+  const username = context.params.username;
 
-  if (!username || typeof username !== "string") {
+  if (!username) {
     return NextResponse.json({ message: "Invalid username" }, { status: 400 });
   }
 
