@@ -6,11 +6,8 @@ interface Test {
   accuracy: number;
 }
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { username: string } }
-): Promise<NextResponse> {
-  const username = params.username;
+export async function GET(req: NextRequest, context: any) {
+  const username = context.params?.username;
 
   if (!username || typeof username !== "string") {
     return NextResponse.json({ message: "Invalid username" }, { status: 400 });
