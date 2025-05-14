@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(
-  request: NextRequest,
+  req: NextRequest,
   { params }: { params: { username: string } }
-) {
+): Promise<NextResponse> {
   const username = params.username;
 
-  if (!username) {
-    return NextResponse.json({ message: "Username missing" }, { status: 400 });
+  if (!username || typeof username !== "string") {
+    return NextResponse.json({ message: "Invalid username" }, { status: 400 });
   }
 
   try {
@@ -38,9 +38,9 @@ export async function GET(
 
     return NextResponse.json({ tests });
   } catch (error) {
-    console.error(error);
+    console.error("API error:", error);
     return NextResponse.json(
-      { message: "Internal Server Error" },
+      { message: "Something went wrong" },
       { status: 500 }
     );
   }
