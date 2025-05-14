@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// Nu mai e nevoie de interface Test, tiparea este implicită
+interface Test {
+  wpm: number;
+  accuracy: number;
+}
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { username: string } }
+  context: { params: { username: string } }
 ) {
-  const username = params.username;
+  const username = context.params.username;
 
   if (!username || typeof username !== "string") {
     return NextResponse.json({ message: "Invalid username" }, { status: 400 });
@@ -26,17 +30,25 @@ export async function GET(
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    const tests = await prisma.test.findMany({
+    const tests: Test[] = await prisma.test.findMany({
       where: { userId: user.id },
       select: { wpm: true, accuracy: true },
     });
 
     const totalTests = tests.length;
+    const maxWPM = totalTests > 0 ? Math.max(...tests.map((t) => t.wpm)) : null;
+
+    const averageAccuracy =
+      totalTests > 0
+        ? tests.reduce((sum, t) => sum + t.accuracy, 0) / totalTests
+        : null;
 
     return NextResponse.json({
       ...user,
       stats: {
-        totalTests
+        totalTests,
+        maxWPM,
+        averageAccuracy,
       },
     });
   } catch (error) {
