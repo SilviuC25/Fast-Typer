@@ -1,16 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+interface Context {
+  params: {
+    username: string;
+  };
+}
+
 interface Test {
   wpm: number;
   accuracy: number;
 }
 
 export async function GET(
-  request: NextRequest,
-  context: { params: { username: string } }
+  req: NextRequest,
+  { params }: Context
 ) {
-  const username = context.params.username;
+  const username = params.username;
 
   if (!username || typeof username !== "string") {
     return NextResponse.json({ message: "Invalid username" }, { status: 400 });
