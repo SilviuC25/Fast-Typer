@@ -16,13 +16,11 @@ export default function RegisterPage() {
     e.preventDefault();
     setError("");
 
-    // Validare pentru confirmarea parolei
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
     }
 
-    // Creare utilizator
     const res = await fetch("/api/register", {
       method: "POST",
       body: JSON.stringify({ email, username, password }),
@@ -45,7 +43,6 @@ export default function RegisterPage() {
         transition={{ duration: 0.5 }}
         className="relative w-full max-w-md"
       >
-        {/* Animated Box */}
         <div className="group relative p-8 rounded-xl bg-white/5 backdrop-blur-md overflow-hidden transition-transform duration-500 transform hover:scale-105">
           <div className="absolute inset-0 z-0 rounded-xl pointer-events-none before:absolute before:inset-0 before:rounded-xl before:border-2 before:border-indigo-600 before:animate-drawBorder"></div>
 
