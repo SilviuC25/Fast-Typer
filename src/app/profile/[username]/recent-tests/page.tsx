@@ -75,7 +75,7 @@ export default function RecentTestsPage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.05 }}
-            className="group relative p-5 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-700 shadow backdrop-blur-md transition-transform duration-300 hover:scale-[1.02]"
+            className="group relative p-5 rounded-xl overflow-hidden border border-zinc-200 shadow backdrop-blur-md transition-transform duration-300 hover:scale-[1.02]"
           >
             <div className="absolute inset-0 z-0 rounded-xl pointer-events-none before:absolute before:inset-0 before:rounded-xl before:border-2 before:border-indigo-500 before:opacity-0 group-hover:before:opacity-100 before:animate-drawBorder"></div>
 
@@ -84,7 +84,7 @@ export default function RecentTestsPage() {
                 <p className="text-xs text-zinc-500">
                   {new Date(test.createdAt).toLocaleString()}
                 </p>
-                <span className="text-xs bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300 px-2 py-0.5 rounded-full font-medium">
+                <span className="text-xs bg-indigo-100 text-indigo-600 px-2 py-0.5 rounded-full font-medium">
                   {test.language} · {test.difficulty}
                 </span>
               </div>
@@ -115,12 +115,12 @@ function Stat({
 }) {
   return (
     <div>
-      <p className="text-zinc-500 dark:text-zinc-400">{label}</p>
+      <p className="text-zinc-500">{label}</p>
       <p
         className={`font-semibold ${
           highlight
-            ? "text-indigo-600 dark:text-indigo-400 text-lg"
-            : "text-zinc-900 dark:text-white"
+            ? "text-indigo-600 text-lg"
+            : "text-zinc-900"
         }`}
       >
         {value}

@@ -27,10 +27,8 @@ const ResultModal = ({ wpm, correctWords, wrongWords, onClose }: ResultModalProp
         exit={{ y: 100 }}
         transition={{ duration: 0.3 }}
       >
-        {/* Animated border */}
         <div className="absolute inset-0 z-0 rounded-xl pointer-events-none before:absolute before:inset-0 before:rounded-xl before:border-2 before:border-indigo-600 before:animate-drawBorder"></div>
 
-        {/* Modal content */}
         <div className="relative z-10 text-center text-indigo-900">
           <h2 className="text-3xl font-bold text-indigo-600 mb-4">Game Over</h2>
           <p>Your speed: <strong>{wpm} WPM</strong></p>

@@ -165,7 +165,7 @@ export default function Game({ user }: GameProps) {
 
   return (
     <div
-      className="flex flex-col items-center justify-center min-h-screen w-full px-6 text-gray-800 relative"
+      className="flex flex-col items-center justify-center min-h-screen w-full px-6 text-indigo-600 relative"
       onClick={() => inputRef.current?.focus()}
     >
       <motion.h1
@@ -173,7 +173,7 @@ export default function Game({ user }: GameProps) {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
       >
-        Typing Speed Game
+        FastTyper Game
       </motion.h1>
 
       <div className="flex flex-wrap justify-center gap-8 mb-6">

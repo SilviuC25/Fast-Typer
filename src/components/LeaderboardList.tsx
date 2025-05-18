@@ -24,12 +24,12 @@ export function LeaderboardList({ tests }: { tests: TestWithUser[] }) {
           const isTopThree = index < 3;
           const bgClass = isTopThree
             ? ['bg-yellow-50 border-yellow-300', 'bg-gray-100 border-gray-300', 'bg-orange-50 border-orange-300'][index]
-            : 'bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700';
+            : 'bg-white border-zinc-200 ';
 
           const medal = ['🥇', '🥈', '🥉'][index];
           const textColor = isTopThree
             ? ['text-yellow-500', 'text-indigo-500', 'text-orange-800'][index]
-            : 'text-zinc-800 dark:text-white';
+            : 'text-zinc-800';
 
           const wpmColor =
             test.wpm >= 60
@@ -67,13 +67,13 @@ export function LeaderboardList({ tests }: { tests: TestWithUser[] }) {
                 </CardContent>
 
                 <div className="flex gap-2">
-                  <Badge variant="outline" className="bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300">
+                  <Badge variant="outline" className="bg-indigo-100 text-indigo-800">
                     {test.language}
                   </Badge>
-                  <Badge variant="outline" className="bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-300">
+                  <Badge variant="outline" className="bg-emerald-100 text-emerald-800">
                     {test.difficulty}
                   </Badge>
-                  <Badge variant="outline" className="bg-rose-100 text-rose-800 dark:bg-rose-900 dark:text-rose-300">
+                  <Badge variant="outline" className="bg-rose-100 text-rose-800">
                     {test.duration}s
                   </Badge>
                 </div>

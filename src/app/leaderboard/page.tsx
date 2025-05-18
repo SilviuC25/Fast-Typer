@@ -20,7 +20,7 @@ export default async function LeaderboardPage() {
     <div className="min-h-screen px-6 py-10 max-w-4xl mx-auto">
       <div className="text-center mb-8 flex items-center justify-center gap-2">
         <Trophy className="text-yellow-500 w-8 h-8 animate-pulse" />
-        <h1 className="text-4xl font-bold">Leaderboard</h1>
+        <h1 className="text-4xl font-bold text-indigo-600">Leaderboard</h1>
       </div>
 
       <LeaderboardList tests={topTests} />

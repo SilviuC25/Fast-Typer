@@ -1,4 +1,3 @@
-// src/app/profile/[username]/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -6,7 +5,6 @@ import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 
-// Tipuri pentru datele de la API
 type UserStats = {
   maxWPM: number | null;
   totalTests: number;
@@ -66,20 +64,20 @@ export default function ProfilePage() {
         transition={{ duration: 0.6, ease: "easeOut" }}
         className="relative w-full max-w-4xl rounded-3xl shadow-xl p-8 space-y-8"
       >
-        <div className="relative z-10 border-b pb-4 border-zinc-200 dark:border-zinc-700">
+        <div className="relative z-10 border-b pb-4 border-zinc-200">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">
+              <h1 className="text-3xl font-bold text-indigo-600">
                 @{userData.username}
               </h1>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              <p className="text-sm text-zinc-500">
                 {email}
               </p>
             </div>
 
             <button
               onClick={() => router.push(`/profile/${username}/recent-tests`)}
-              className="relative group px-4 py-2 text-sm font-medium text-gray-800 hover:bg-indigo-50 hover:cursor-pointer rounded-md transition overflow-hidden"
+              className="relative group px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-indigo-50 hover:cursor-pointer rounded-md transition overflow-hidden"
             >
               <span className="relative z-10">View Recent Tests</span>
               <span
@@ -127,14 +125,14 @@ function StatCard({
   return (
     <motion.div
       whileHover={{ scale: 1.03 }}
-      className="rounded-2xl p-6 border border-zinc-200 dark:border-zinc-700 shadow transition-all"
+      className="rounded-2xl p-6 border border-zinc-200 shadow transition-all"
     >
-      <p className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-2">
+      <p className="text-sm font-medium text-zinc-500 mb-2">
         {label}
       </p>
       <p
         className={`text-2xl font-semibold ${
-          color ?? "text-zinc-800 dark:text-white"
+          color ?? "text-zinc-800"
         }`}
       >
         {value}

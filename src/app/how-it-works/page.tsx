@@ -35,7 +35,7 @@ export default function HowItWorksPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
       >
-        How Fast Typer Works
+        How FastTyper Works
       </motion.h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -49,7 +49,6 @@ export default function HowItWorksPage() {
               transition={{ delay: i * 0.15, duration: 0.5 }}
             >
               <div className="group relative p-6 rounded-xl bg-white backdrop-blur-md shadow-md hover:shadow-2xl transition-all duration-300 border border-indigo-200 hover:scale-[1.02]">
-                {/* Animated Border on Hover */}
                 <div className="absolute inset-0 z-0 rounded-xl pointer-events-none before:absolute before:inset-0 before:rounded-xl before:border-2 before:border-indigo-600 before:opacity-0 group-hover:before:opacity-100 before:animate-drawBorder transition-opacity duration-300" />
                 
                 <div className="relative z-10">
